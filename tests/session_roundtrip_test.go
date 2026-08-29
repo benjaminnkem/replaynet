@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -137,3 +138,39 @@ func TestSessionWriterLoadRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestSessionPartialWriteRecovery(t *testing.T) {
+	dir := t.TempDir()
+	path := dir + "/partial.rnet"
+
+	w, err := session.NewWriter(path)
+	if err != nil {
+		t.Fatalf("new writer: %v", err)
+	}
+
+	e1 := session.Event{Type: session.EventRequest, Method: "GET", Path: "/intact"}
+	if err := w.Append(e1); err != nil {
+		t.Fatalf("append: %v", err)
+	}
+	w.Close()
+
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		t.Fatalf("open file: %v", err)
+	}
+	f.Write([]byte{0x00, 0x00, 0x01, 0x00, 0x12, 0x34})
+	f.Close()
+
+	sess, err := session.Load(path)
+	if err != nil {
+		t.Fatalf("load failed on partially truncated file: %v", err)
+	}
+
+	if len(sess.Events) != 1 {
+		t.Fatalf("expected 1 intact event loaded, got %d", len(sess.Events))
+	}
+	if sess.Events[0].Path != "/intact" {
+		t.Errorf("loaded event path mismatch: %s", sess.Events[0].Path)
+	}
+}
+

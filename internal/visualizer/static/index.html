@@ -1,13 +1,170 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>ReplayNet</title>
-<link rel="stylesheet" href="/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReplayNet Live Inspector</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<h1>ReplayNet</h1>
-<div id="timeline"></div>
-<script src="/app.js"></script>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <polyline points="23 20 23 14 17 14"></polyline>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">ReplayNet</span>
+          <span class="brand-subtitle">Timeline Inspector</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div id="connection-status" class="status-indicator connected">
+          <span class="pulse-dot"></span>
+          <span class="status-label">Live Stream</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Metrics Bar -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-title">Total Events</span>
+        <span id="metric-total" class="metric-value">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Requests</span>
+        <span id="metric-requests" class="metric-value text-cyan">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Responses</span>
+        <span id="metric-responses" class="metric-value text-emerald">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Errors / Overrides</span>
+        <span id="metric-errors" class="metric-value text-rose">0</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Latest Offset</span>
+        <span id="metric-duration" class="metric-value text-purple">0ms</span>
+      </div>
+    </section>
+
+    <!-- Swimlane Diagram -->
+    <section class="swimlane-panel">
+      <div class="swimlane-header">
+        <span class="panel-title">Active Traffic Topology</span>
+      </div>
+      <div class="swimlane-container">
+        <div class="lane-node" id="node-client">
+          <div class="node-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div class="node-meta">
+            <span class="node-title">Client App</span>
+            <span class="node-sub">Caller / Test Runner</span>
+          </div>
+        </div>
+
+        <div class="lane-connector" id="connector-client-proxy">
+          <div class="connector-line"></div>
+          <div class="packet packet-req" id="packet-1"></div>
+          <div class="packet packet-resp" id="packet-4"></div>
+          <span class="connector-tag">HTTP</span>
+        </div>
+
+        <div class="lane-node highlight" id="node-replaynet">
+          <div class="node-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8"></polygon>
+            </svg>
+          </div>
+          <div class="node-meta">
+            <span class="node-title">ReplayNet</span>
+            <span class="node-sub">Proxy / Replay Engine</span>
+          </div>
+        </div>
+
+        <div class="lane-connector" id="connector-proxy-upstream">
+          <div class="connector-line"></div>
+          <div class="packet packet-req" id="packet-2"></div>
+          <div class="packet packet-resp" id="packet-3"></div>
+          <span class="connector-tag">Upstream</span>
+        </div>
+
+        <div class="lane-node" id="node-upstream">
+          <div class="node-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div class="node-meta">
+            <span class="node-title">Backend Server</span>
+            <span class="node-sub">Origin / Recorded</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline Controls -->
+    <section class="timeline-panel">
+      <div class="timeline-toolbar">
+        <div class="toolbar-left">
+          <span class="panel-title">Recorded Conversation Timeline</span>
+          <div class="filter-tabs">
+            <button class="tab active" data-filter="all">All</button>
+            <button class="tab" data-filter="request">Requests</button>
+            <button class="tab" data-filter="response">Responses</button>
+            <button class="tab" data-filter="error">Errors & Faults</button>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="Filter path, method, status...">
+          </div>
+          <label class="toggle-label">
+            <input type="checkbox" id="autoscroll-toggle" checked>
+            <span>Auto-scroll</span>
+          </label>
+          <button id="clear-btn" class="btn-secondary" title="Clear view">Clear</button>
+        </div>
+      </div>
+
+      <!-- Events List Header -->
+      <div class="timeline-table-header">
+        <div class="col-index"># Index</div>
+        <div class="col-offset">Offset</div>
+        <div class="col-type">Flow</div>
+        <div class="col-method-status">Method / Code</div>
+        <div class="col-path">Target Path / Details</div>
+      </div>
+
+      <!-- Events List -->
+      <div id="timeline" class="timeline-table-body">
+        <div id="empty-state" class="empty-state">
+          <div class="radar-scan"></div>
+          <p class="empty-title">Awaiting Traffic...</p>
+          <p class="empty-subtitle">Requests and responses flowing through ReplayNet will appear in real time.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
 </body>
 </html>

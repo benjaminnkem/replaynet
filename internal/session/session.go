@@ -2,6 +2,7 @@ package session
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"time"
 )
@@ -54,6 +55,9 @@ func Load(path string) (*Session, error) {
 	for {
 		e, err := ReadEvent(r)
 		if err == ErrCleanEOF {
+			break
+		}
+		if (err == io.ErrUnexpectedEOF || err == io.EOF) && len(sess.Events) > 0 {
 			break
 		}
 		if err != nil {
