@@ -27,12 +27,15 @@ All of this has been built, compiled, and tested — not just scaffolded.
   hijack, falls back to 503 if hijack unsupported), status override.
   Fully verified in `tests/fault_injection_test.go`.
 - **`internal/visualizer`** (§5) — SSE server broadcasting compact per-event
-  JSON messages, non-blocking broadcast with per-subscriber buffered channels
-  that drop rather than block proxy/replay throughput (`tests/visualizer_test.go`).
-  Static UI (`static/index.html`, `app.js`, `style.css`) includes a live
-  swimlane topology diagram with packet flow animations, metrics summary,
-  real-time timeline table with `#Index` badges for fault targeting,
-  search/filters, and auto-scroll.
+  JSON messages with headers and body previews, non-blocking broadcast with
+  per-subscriber buffered channels that drop rather than block proxy/replay
+  throughput (`tests/visualizer_test.go`). Static UI (`static/index.html`,
+  `app.js`, `style.css`) includes a live swimlane topology diagram with packet
+  flow animations, real-time metrics with status distribution breakdown (2xx/3xx/4xx/5xx),
+  interactive slide-over Inspector Drawer with formatted JSON syntax highlighting,
+  HTTP headers grid, cURL replication command generator, linked transaction pair view
+  with latency (RTT) calculation, theme engine (Cyber Dark / Slate Studio / Clean Light),
+  session JSON export, sample traffic simulator, search/filters, and auto-scroll.
 - **`cmd/replaynet`** (§6) — CLI with `proxy` and `replay` subcommands,
   `--fault` supports repeated flags, `--inspect PORT` wires the visualizer in on
   both paths.

@@ -15,12 +15,15 @@ import (
 var staticFiles embed.FS
 
 type eventMsg struct {
-	Index      int    `json:"index"`
-	OffsetMs   int64  `json:"offsetMs"`
-	Type       string `json:"type"`
-	Method     string `json:"method,omitempty"`
-	Path       string `json:"path,omitempty"`
-	StatusCode int    `json:"status,omitempty"`
+	Index      int                 `json:"index"`
+	OffsetMs   int64               `json:"offsetMs"`
+	Type       string              `json:"type"`
+	Method     string              `json:"method,omitempty"`
+	Path       string              `json:"path,omitempty"`
+	StatusCode int                 `json:"status,omitempty"`
+	Headers    map[string][]string `json:"headers,omitempty"`
+	Body       string              `json:"body,omitempty"`
+	BodySize   int                 `json:"bodySize,omitempty"`
 }
 
 type Server struct {
@@ -40,6 +43,15 @@ func (s *Server) Broadcast(e session.Event) {
 		typ = "response"
 	}
 
+	var bodyStr string
+	if len(e.Body) > 0 {
+		if len(e.Body) <= 32*1024 {
+			bodyStr = string(e.Body)
+		} else {
+			bodyStr = string(e.Body[:32*1024]) + " ... [truncated]"
+		}
+	}
+
 	msg := eventMsg{
 		Index:      e.Index,
 		OffsetMs:   e.Offset.Milliseconds(),
@@ -47,6 +59,9 @@ func (s *Server) Broadcast(e session.Event) {
 		Method:     e.Method,
 		Path:       e.Path,
 		StatusCode: e.StatusCode,
+		Headers:    e.Headers,
+		Body:       bodyStr,
+		BodySize:   len(e.Body),
 	}
 
 	s.mu.Lock()
