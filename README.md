@@ -102,11 +102,35 @@ for a judge to discover:
   than actually closing the connection — documented here rather than
   silently assumed to always work.
 
-## Build
+## Automated Demo Workflow
+
+To run the complete end-to-end recording, replay, fault injection, and visualizer demo with a single command:
+
+```bash
+./scripts/demo.sh
+```
+
+This will automatically:
+1. Start a mock upstream backend on `:8080`
+2. Start ReplayNet proxy recording on `:9000` (inspector at `:9001`) and record traffic
+3. Shut down the backend completely
+4. Deterministically replay the conversation on `:9002` without any backend running
+5. Inject faults (e.g. override status to 503) on specific event indices to simulate resilience testing
+6. Clean up all background processes cleanly
+
+## Build & Verification
+
+```bash
+make build       # compiles with -trimpath -> bin/replaynet
+make test        # runs 14 unit and integration tests
+make deps-proof  # proves zero third-party dependencies (outputs deps-proof.txt)
+make repro       # confirms reproducible byte-identical build
+```
+
+### Reproducible Build Hashes
 
 ```
-make build   # -trimpath, outputs bin/replaynet
-make test    # runs the full test suite
-make deps-proof
-make repro   # builds twice, confirms byte-identical output
+build 1: 7b65915cf74e142c8a32c292efc055aa8099e3b2c3a1f77b663a3472d7f5a14c
+build 2: 7b65915cf74e142c8a32c292efc055aa8099e3b2c3a1f77b663a3472d7f5a14c
+MATCH: reproducible build confirmed
 ```

@@ -1,5 +1,6 @@
 [package]
 name = "replaynet"
+track = "C"
 description = "Zero-dependency HTTP conversation recording, deterministic replay, and network fault injection proxy"
 version = "0.1.0"
 license = "MIT"
