@@ -59,10 +59,10 @@ re-reading why they were cut first (README + spec §1 scope decision):
 - Truncate / bandwidth-throttle / half-close / disconnect-after fault modes
 - Session diff (`replaynet diff`)
 
+- Package Killer target (Toxiproxy) stats verified and documented in STDLIB.md (12.3k+ GitHub stars).
+
 ## Remaining items
 
-1. **Package Killer target (Toxiproxy) download/usage metrics check** —
-   verify numbers before citing in final presentation.
-2. **Demo video recording** — record a full demonstration showing
+1. **Demo video recording** — record a full demonstration showing
    recording a failing step, replaying without the backend, altering history
    with `--fault`, and observing the live visualizer inspector.
