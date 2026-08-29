@@ -18,11 +18,4 @@ library feature used instead.
 
 ## Package Killer
 
-Positioned against **Toxiproxy**, a widely-used chaos-engineering fault
-injection tool for network testing. ReplayNet covers the same conceptual
-need — deliberately injecting latency, drops, and failures into a network
-conversation for testing purposes — through a from-scratch implementation
-with zero dependencies, plus the additional record/replay capability
-Toxiproxy does not provide. Verify current adoption/download figures before
-citing a specific number in any final write-up rather than reusing an
-unverified figure.
+Positioned against **Toxiproxy** (Shopify's resilience testing proxy with 12.3k+ GitHub stars), a widely-used chaos-engineering fault injection tool for network testing. ReplayNet covers the same conceptual need — deliberately injecting latency, drops, and failures into a network conversation for testing purposes — through a from-scratch implementation with zero dependencies, plus the additional deterministic record/replay capability Toxiproxy does not provide.
