@@ -1,5 +1,5 @@
 # ReplayNet — Full Technical Specification
-**Go 1.27 · stdlib only · solo build, AI-assisted (Grok CLI / Codex)**
+**Go 1.22+ · stdlib only · solo build, AI-assisted**
 
 This document is written to be handed directly to a coding assistant as context. Structs and function signatures are fixed — implement against them rather than inventing alternatives, so output stays consistent across sessions/tools.
 

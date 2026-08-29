@@ -11,8 +11,8 @@ echo "================================================================="
 # Clean previous sessions and build binaries
 rm -f demo.rnet
 mkdir -p bin
-go build -trimpath -o bin/replaynet ./cmd/replaynet
-go build -trimpath -o bin/mock_server ./scripts/mock_server.go
+go build -trimpath -buildvcs=false -o bin/replaynet ./cmd/replaynet
+go build -trimpath -buildvcs=false -o bin/mock_server ./scripts/mock_server.go
 
 # Cleanup trap
 cleanup() {

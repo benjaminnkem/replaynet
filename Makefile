@@ -1,7 +1,7 @@
 .PHONY: build test bench deps-proof repro demo install clean
 
 build:
-	go build -trimpath -o bin/replaynet ./cmd/replaynet
+	go build -trimpath -buildvcs=false -o bin/replaynet ./cmd/replaynet
 
 test:
 	go test -v ./...
