@@ -1,0 +1,42 @@
+body {
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: ui-monospace, monospace;
+  margin: 0;
+  padding: 24px;
+}
+
+h1 {
+  font-size: 16px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+#timeline {
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid #222;
+  padding: 12px;
+}
+
+.row {
+  padding: 4px 0;
+  border-bottom: 1px solid #151515;
+}
+
+.row.request {
+  color: #6ab0f3;
+}
+
+.status-ok {
+  color: #4caf50;
+}
+
+.status-warn {
+  color: #ff9800;
+}
+
+.status-error {
+  color: #f44336;
+}
