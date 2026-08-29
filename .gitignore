@@ -9,7 +9,6 @@ bin/
 Thumbs.db
 
 # Editor/IDE
-.vscode/
 .idea/
 *.swp
 
@@ -17,3 +16,5 @@ Thumbs.db
 *.test
 *.out
 coverage.html
+config.bat
+node_modules
