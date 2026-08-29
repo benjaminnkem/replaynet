@@ -1,0 +1,11 @@
+[package]
+name = "replaynet"
+description = "Zero-dependency HTTP conversation recording, deterministic replay, and network fault injection proxy"
+version = "0.1.0"
+license = "MIT"
+language = "go"
+stdlib_only = true
+
+[package_killer]
+target = "toxiproxy"
+claim = "Zero-dependency network fault injection with deterministic HTTP record and replay capabilities"
