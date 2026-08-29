@@ -25,6 +25,10 @@ func main() {
 		runProxy(os.Args[2:])
 	case "replay":
 		runReplay(os.Args[2:])
+	case "version", "-version", "--version", "-v":
+		fmt.Println("replaynet v0.1.0 (zero-dependency stdlib-only)")
+	case "help", "-help", "--help", "-h":
+		usage()
 	default:
 		usage()
 		os.Exit(1)
@@ -32,20 +36,30 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: replaynet proxy --listen :9000 --upstream http://localhost:3000 --session out.rnet [--inspect :9001]")
-	fmt.Fprintln(os.Stderr, "       replaynet replay session.rnet --listen :9002 [--fault at=N,type=latency,ms=N] [--inspect :9003]")
+	fmt.Fprintln(os.Stderr, "ReplayNet - Zero-dependency HTTP recording, deterministic replay & fault injection")
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "Usage:")
+	fmt.Fprintln(os.Stderr, "  replaynet proxy --listen :9000 --upstream http://localhost:3000 --session out.rnet [--inspect :9001]")
+	fmt.Fprintln(os.Stderr, "  replaynet replay session.rnet --listen :9002 [--fault at=N,type=latency,ms=N] [--inspect :9003]")
+	fmt.Fprintln(os.Stderr, "  replaynet version")
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "Commands:")
+	fmt.Fprintln(os.Stderr, "  proxy    Record inbound HTTP traffic and forward to upstream")
+	fmt.Fprintln(os.Stderr, "  replay   Deterministically replay recorded session without upstream")
+	fmt.Fprintln(os.Stderr, "  version  Print version information")
 }
 
 func runProxy(args []string) {
 	fs := flag.NewFlagSet("proxy", flag.ExitOnError)
-	listen := fs.String("listen", ":9000", "")
-	upstream := fs.String("upstream", "", "")
-	sessionPath := fs.String("session", "session.rnet", "")
-	inspect := fs.String("inspect", "", "")
+	listen := fs.String("listen", ":9000", "address to listen on")
+	upstream := fs.String("upstream", "", "upstream backend URL to proxy traffic to (required)")
+	sessionPath := fs.String("session", "session.rnet", "path to .rnet session file to write")
+	inspect := fs.String("inspect", "", "optional port to start the live visualizer inspector on")
 	fs.Parse(args)
 
 	if *upstream == "" {
 		fmt.Fprintln(os.Stderr, "error: --upstream is required")
+		fs.Usage()
 		os.Exit(1)
 	}
 
@@ -80,17 +94,25 @@ func runProxy(args []string) {
 }
 
 func runReplay(args []string) {
+	fs := flag.NewFlagSet("replay", flag.ExitOnError)
+	listen := fs.String("listen", ":9002", "address to listen on")
+	inspect := fs.String("inspect", "", "optional port to start the live visualizer inspector on")
+	var faultArgs repeatedFlag
+	fs.Var(&faultArgs, "fault", "fault rule e.g. 'at=3,type=latency,ms=4000' or 'at=3,type=status,code=503'")
+
 	if len(args) == 0 {
 		fmt.Fprintln(os.Stderr, "error: session file required")
+		usage()
 		os.Exit(1)
 	}
-	sessionPath := args[0]
 
-	fs := flag.NewFlagSet("replay", flag.ExitOnError)
-	listen := fs.String("listen", ":9002", "")
-	inspect := fs.String("inspect", "", "")
-	var faultArgs repeatedFlag
-	fs.Var(&faultArgs, "fault", "")
+	if args[0] == "-h" || args[0] == "--help" || args[0] == "help" {
+		fmt.Fprintln(os.Stderr, "usage: replaynet replay <session.rnet> [flags]")
+		fs.Usage()
+		os.Exit(0)
+	}
+
+	sessionPath := args[0]
 	fs.Parse(args[1:])
 
 	sess, err := session.Load(sessionPath)

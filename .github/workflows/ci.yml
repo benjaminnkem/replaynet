@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (Zero-Deps Verification)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        go: ['1.22', '1.23']
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Verify Zero Dependencies
+        run: |
+          make deps-proof
+          cat deps-proof.txt
+          test $(wc -l < deps-proof.txt) -eq 1
+          echo "Verified: 0 third-party runtime dependencies."
+
+      - name: Build Binary
+        run: make build
+
+      - name: Run Test Suite
+        run: make test
+
+      - name: Run Performance Benchmarks
+        run: make bench
+
+      - name: Verify Reproducible Build
+        run: make repro
+
+      - name: Run Automated Demo Workflow
+        run: ./scripts/demo.sh
